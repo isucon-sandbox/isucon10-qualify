@@ -1,4 +1,4 @@
-setup: mysql-setup, nginx-setup
+setup: mysql-setup nginx-setup
 
 mysql-setup:
 	sudo cp mysqld.cnf /etc/mysql/mysql.conf.d/
