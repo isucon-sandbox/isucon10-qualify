@@ -3,7 +3,7 @@ on: [push]
 # ワークフローの実行処理
 jobs:
   # ジョブ名(任意)
-  build:
+  deploy:
     # ジョブが実行されるランナー(仮想デバイス)の種類
     runs-on: ubuntu-latest
     # タイムアウトの時間を設定しておく
