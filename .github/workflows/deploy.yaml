@@ -7,7 +7,7 @@ jobs:
     # ジョブが実行されるランナー(仮想デバイス)の種類
     runs-on: ubuntu-latest
     # タイムアウトの時間を設定しておく
-    timeout-minutes: 10
+    timeout-minutes: 30
 
     # ジョブのステップ
     steps:
@@ -27,4 +27,4 @@ jobs:
         # SSH接続して、git pullする
         echo "${{ secrets.GIT_PRIVATE_KEY }}" > private_key
         chmod 600 private_key
-        ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd isucon10-qualify/ && git pull && make steup"
+        ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd isucon10-qualify/ && git pull && make setup"
