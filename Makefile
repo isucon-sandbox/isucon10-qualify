@@ -1,4 +1,9 @@
-setup: mysql-setup nginx-setup
+setup: webapp-setup mysql-setup nginx-setup
+
+webapp-setup:
+	cp webapp/main.go ~/isuumo/webapp/go/
+	cd ~/isuumo/webapp/go && make
+	sudo systemctl restart isuumo
 
 mysql-setup:
 	sudo cp mysqld.cnf /etc/mysql/mysql.conf.d/
