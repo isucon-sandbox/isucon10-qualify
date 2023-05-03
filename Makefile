@@ -15,7 +15,7 @@ nginx-setup:
 	sudo systemctl restart nginx
 
 ALPSORT=sum
-ALPM="/api/isu/.+/icon,/api/isu/.+/graph,/api/isu/.+/condition,/api/isu/[-a-z0-9]+,/api/condition/[-a-z0-9]+,/api/catalog/.+,/api/condition\?,/isu/........-....-.+,/?jwt=.+"
+ALPM="/api/estate/[0-9]+,/api/estate/req_doc/[0-9]+,/api/chair/[0-9]+,/_next/static/.*,/images/chair/.*,/images/estate/.*,/b2f8c04104ceb75c948a76385678065a50b55f52/.*"
 OUTFORMAT=count,method,1xx,2xx,3xx,4xx,5xx,uri,min,max,sum,avg,p99
 
 .PHONY: alp
