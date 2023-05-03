@@ -15,7 +15,7 @@ nginx-setup:
 	sudo systemctl restart nginx
 
 ALPSORT=sum
-ALPM="/api/estate/[0-9]+,/api/estate/req_doc/[0-9]+,/api/chair/[0-9]+,/_next/static/.*,/images/chair/.*,/images/estate/.*,/b2f8c04104ceb75c948a76385678065a50b55f52/.*"
+ALPM="/api/estate/low_priced,/api/chair/low_priced,/api/chair/search,/api/chair/search/condition,/api/chair/[0-9]+,/api/chair/buy/[0-9]+,/api/estate/search,/api/estate/search/condition,/api/estate/req_doc/[0-9]+,/api/estate/nazotte,/api/estate/[0-9]+,/api/recommended_estate/[0-9]+,/api/chair,/api/estate,/_next/static/.*,/images/chair/.*,/images/estate/.*,/b2f8c04104ceb75c948a76385678065a50b55f52/.*"
 OUTFORMAT=count,method,1xx,2xx,3xx,4xx,5xx,uri,min,max,sum,avg,p99
 
 .PHONY: alp
@@ -29,3 +29,5 @@ alpsave:
 .PHONY: alpload
 alpload:
 	sudo alp ltsv --load /tmp/alp.dump --sort $(ALPSORT) --reverse -o count,method,uri,min,max,sum,avg,p99 -q
+
+
