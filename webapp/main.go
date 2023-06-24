@@ -507,7 +507,6 @@ func searchChairs(c echo.Context) error {
 	searchCondition := strings.Join(conditions, " AND ")
 	limitOffset := " ORDER BY popularity DESC, id ASC LIMIT ? OFFSET ?"
 
-	// コネクションを追加
 	tx, err := db.Beginx()
 	if err != nil {
 		c.Logger().Errorf("failed to begin tx: %v", err)
@@ -785,26 +784,38 @@ func searchEstates(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	searchQuery := "SELECT * FROM estate WHERE "
-	countQuery := "SELECT COUNT(*) FROM estate WHERE " // FIXME: *
+	searchQuery := "SELECT SQL_CALC_FOUND_ROWS * FROM estate WHERE "
+	countQuery := "SELECT FOUND_ROWS()"
 	searchCondition := strings.Join(conditions, " AND ")
 	limitOffset := " ORDER BY popularity DESC, id ASC LIMIT ? OFFSET ?"
 
-	var res EstateSearchResponse
-	err = db.Get(&res.Count, countQuery+searchCondition, params...)
+	tx, err := db.Beginx()
 	if err != nil {
-		c.Logger().Errorf("searchEstates DB execution error : %v", err)
+		c.Logger().Errorf("failed to begin tx: %v", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
+	var res EstateSearchResponse
 	estates := []Estate{}
 	params = append(params, perPage, page*perPage)
-	err = db.Select(&estates, searchQuery+searchCondition+limitOffset, params...)
+	err = tx.Select(&estates, searchQuery+searchCondition+limitOffset, params...)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return c.JSON(http.StatusOK, EstateSearchResponse{Count: 0, Estates: []Estate{}})
 		}
 		c.Logger().Errorf("searchEstates DB execution error : %v", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	err = tx.Get(&res.Count, countQuery+searchCondition, params...)
+	if err != nil {
+		c.Logger().Errorf("searchEstates DB execution error : %v", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		c.Echo().Logger.Errorf("transaction commit error : %v", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
