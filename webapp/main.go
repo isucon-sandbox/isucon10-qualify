@@ -807,7 +807,7 @@ func searchEstates(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	err = tx.Get(&res.Count, countQuery+searchCondition, params...)
+	err = tx.Get(&res.Count, countQuery)
 	if err != nil {
 		c.Logger().Errorf("searchEstates DB execution error : %v", err)
 		return c.NoContent(http.StatusInternalServerError)
