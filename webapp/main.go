@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/csv"
 	"encoding/json"
@@ -508,7 +509,7 @@ func searchChairs(c echo.Context) error {
 	limitOffset := " ORDER BY popularity DESC, id ASC LIMIT ? OFFSET ?"
 
 	// コネクションを追加
-	ctx := c.Background()
+	ctx := context.Background()
 	conn, _ := db.Conn(ctx)
 	defer conn.Close()
 
@@ -517,7 +518,8 @@ func searchChairs(c echo.Context) error {
 	chairs := []Chair{}
 	params = append(params, perPage, page*perPage)
 	// err = db.Select(&chairs, searchQuery+searchCondition+limitOffset, params...)
-	err = conn.Select(&chairs, searchQuery+searchCondition+limitOffset, params...)
+	err = conn.QueryRowContext(ctx, searchQuery+searchCondition+limitOffset, params...).Scan(&chairs)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return c.JSON(http.StatusOK, ChairSearchResponse{Count: 0, Chairs: []Chair{}})
@@ -527,7 +529,7 @@ func searchChairs(c echo.Context) error {
 	}
 
 	// err = db.Get(&res.Count, countQuery)
-	err = conn.Get(&res.Count, countQuery)
+	err = conn.QueryRowContext(ctx, countQuery).Scan(&res.Count)
 	if err != nil {
 		c.Logger().Errorf("searchChairs DB execution error : %v", err)
 		return c.NoContent(http.StatusInternalServerError)
