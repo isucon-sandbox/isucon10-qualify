@@ -895,7 +895,8 @@ func searchEstateNazotte(c echo.Context) error {
 	// err = db.Select(&estatesInBoundingBox, query, b.BottomRightCorner.Latitude, b.TopLeftCorner.Latitude, b.BottomRightCorner.Longitude, b.TopLeftCorner.Longitude)
 	estatesInPolygon := []Estate{}
 
-	query := `SELECT * FROM estate WHERE latitude <= ? AND latitude >= ? AND longitude <= ? AND longitude >= ? AND ST_Contains(ST_PolygonFromText(?), ST_GeomFromText(CONCAT('POINT(', latitude, ' ', longitude, ')'))) ORDER BY popularity DESC, id ASC LIMIT ?`
+	// query := `SELECT * FROM estate WHERE latitude <= ? AND latitude >= ? AND longitude <= ? AND longitude >= ? AND ST_Contains(ST_PolygonFromText(?), ST_GeomFromText(CONCAT('POINT(', latitude, ' ', longitude, ')'))) ORDER BY popularity DESC, id ASC LIMIT ?`
+	query := `SELECT * FROM estate WHERE latitude <= ? AND latitude >= ? AND longitude <= ? AND longitude >= ? AND ST_Contains(ST_PolygonFromText(?), POINT(latitude, longitude)) ORDER BY popularity DESC, id ASC LIMIT ?`
 	err = db.Select(&estatesInPolygon, query, b.BottomRightCorner.Latitude, b.TopLeftCorner.Latitude, b.BottomRightCorner.Longitude, b.TopLeftCorner.Longitude, coordinates.coordinatesToText(), NazotteLimit)
 	if err == sql.ErrNoRows {
 		c.Echo().Logger.Infof("select * from estate where latitude ...", err)
