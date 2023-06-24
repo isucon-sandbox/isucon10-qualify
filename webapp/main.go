@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"encoding/csv"
 	"encoding/json"
@@ -509,16 +508,17 @@ func searchChairs(c echo.Context) error {
 	limitOffset := " ORDER BY popularity DESC, id ASC LIMIT ? OFFSET ?"
 
 	// コネクションを追加
-	ctx := context.Background()
-	conn, _ := db.Conn(ctx)
-	defer conn.Close()
+	tx, err := db.Beginx()
+	if err != nil {
+		c.Logger().Errorf("failed to begin tx: %v", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
 
 	var res ChairSearchResponse
 
 	chairs := []Chair{}
 	params = append(params, perPage, page*perPage)
-	// err = db.Select(&chairs, searchQuery+searchCondition+limitOffset, params...)
-	err = conn.QueryRowContext(ctx, searchQuery+searchCondition+limitOffset, params...).Scan(&chairs)
+	err = tx.Select(&chairs, searchQuery+searchCondition+limitOffset, params...)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -528,10 +528,15 @@ func searchChairs(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	// err = db.Get(&res.Count, countQuery)
-	err = conn.QueryRowContext(ctx, countQuery).Scan(&res.Count)
+	err = tx.Get(&res.Count, countQuery)
 	if err != nil {
 		c.Logger().Errorf("searchChairs DB execution error : %v", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		c.Echo().Logger.Errorf("transaction commit error : %v", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
