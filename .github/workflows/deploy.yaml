@@ -27,4 +27,4 @@ jobs:
         # SSH接続して、git pullする
         echo "${{ secrets.GIT_PRIVATE_KEY }}" > private_key
         chmod 600 private_key
-        ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd isucon10-qualify/ && git pull && make setup"
+        ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "source ~/.bashrc && cd isucon10-qualify/ && git pull && make setup"
